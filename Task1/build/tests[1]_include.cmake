@@ -1,0 +1,5 @@
+if(EXISTS "C:/vscpr/Tasks_Furman/build/tests[1]_tests.cmake")
+  include("C:/vscpr/Tasks_Furman/build/tests[1]_tests.cmake")
+else()
+  add_test(tests_NOT_BUILT tests_NOT_BUILT)
+endif()

@@ -1,0 +1,3 @@
+C:/vscpr/Tasks_Furman/build/_deps/googletest-subbuild/CMakeFiles/googletest-populate.dir
+C:/vscpr/Tasks_Furman/build/_deps/googletest-subbuild/CMakeFiles/ALL_BUILD.dir
+C:/vscpr/Tasks_Furman/build/_deps/googletest-subbuild/CMakeFiles/ZERO_CHECK.dir

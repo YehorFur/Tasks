@@ -1,5 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
+
+#include "list.h"
 
 void StringListInit(char** &list) {
     list = (char**)malloc(sizeof(char*));
@@ -11,14 +14,7 @@ void StringListDestroy(char** &list) {
         free(list[i]);
     }
     free(list);
-}
-
-int StringListSize(char** list) {
-    int size = 0;
-    while(list[size]!=NULL) {
-        size++;
-    }
-    return size;
+    list = NULL;
 }
 
 void StringListAdd(char** &list, const char* str) {
@@ -43,12 +39,19 @@ void StringListRemove(char** &list, const char* str){
     list = (char**)realloc(list, sizeof(char*) * (j + 1));
 }
 
+int StringListSize(char** list) {
+    int size = 0;
+    while(list[size]!=NULL) {
+        size++;
+    }
+    return size;
+}
+
 int StringListIndexOf(char** list, char* str) {
     for (int i = 0; list[i] != NULL; i++){
         if (strcmp(list[i], str) == 0) {
             return i;
         }
-        i++;
     }
     return -1;
 }
@@ -73,7 +76,27 @@ void StringListRemoveDuplicates(char** list){
     list[size] = NULL;
 }
 
-void merge(char** list, int left, int mid, int right) {
+void StringListReplaceInStrings(char** &list, const char* before, const char* after){
+    for(int i = 0; list[i] != NULL; i++){
+        char* ptr = list[i];
+        while((ptr = strstr(ptr, before)) != NULL){
+            int pos = ptr - list[i];
+            int before_len = strlen(before);
+            int after_len = strlen(after);
+            int tail_len = strlen(ptr + before_len);
+            char* tail = (char*)malloc(tail_len + 1);
+            strcpy(tail, ptr + before_len);
+            list[i] = (char*)realloc(list[i], strlen(list[i]) - before_len + after_len + 1);
+            ptr = list[i] + pos;
+            strcpy(ptr, after);
+            strcpy(ptr + after_len, tail);
+            free(tail);
+            ptr += after_len;
+        }
+    }
+}
+
+void mergeSort(char** list, int left, int mid, int right) {
     int n1 = mid - left + 1;
     int n2 = right - mid;
 
@@ -118,36 +141,16 @@ void merge(char** list, int left, int mid, int right) {
     free(rightArr);
 }
 
-void StringListSort(char** list, int left, int right) {
+void ListSort(char** list, int left, int right) {
     if (left < right) {
         int mid = left + (right - left) / 2;
-        StringListSort(list, left, mid);
-        StringListSort(list, mid + 1, right);
-        merge(list, left, mid, right);
+        ListSort(list, left, mid);
+        ListSort(list, mid + 1, right);
+        mergeSort(list, left, mid, right);
     }
 }
 
-void StringListReplaceInStrings(char** &list, const char* before, const char* after){
-    for(int i = 0; list[i] != NULL; i++){
-        char* ptr = list[i];
-        while((ptr = strstr(ptr, before)) != NULL){
-            int pos = ptr - list[i];
-            int before_len = strlen(before);
-            int after_len = strlen(after);
-            int tail_len = strlen(ptr + before_len);
-            char* tail = (char*)malloc(tail_len + 1);
-            strcpy(tail, ptr + before_len);
-            list[i] = (char*)realloc(list[i], strlen(list[i]) - before_len + after_len + 1);
-            ptr = list[i] + pos;
-            strcpy(ptr, after);
-            strcpy(ptr + after_len, tail);
-            free(tail);
-            ptr += after_len;
-        }
-    }
-}
-
-int main()
-{
-    return 0;
+void StringListSort(char** list) {
+    int size = StringListSize(list);
+    ListSort(list, 0, size - 1);
 }

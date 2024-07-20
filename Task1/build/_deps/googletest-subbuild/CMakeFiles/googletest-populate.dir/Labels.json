@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "C:/vscpr/Tasks_Furman/build/_deps/googletest-subbuild/CMakeFiles/googletest-populate"
+		},
+		{
+			"file" : "C:/vscpr/Tasks_Furman/build/_deps/googletest-subbuild/CMakeFiles/f3c42a6e574e1501e3e9e85f2123ad54/googletest-populate.rule"
+		},
+		{
+			"file" : "C:/vscpr/Tasks_Furman/build/_deps/googletest-subbuild/CMakeFiles/d8cdd085f03091950782b78c1bd22400/googletest-populate-complete.rule"
+		},
+		{
+			"file" : "C:/vscpr/Tasks_Furman/build/_deps/googletest-subbuild/CMakeFiles/beda3ab0d1a9fe31e100465407ff6c3a/googletest-populate-build.rule"
+		},
+		{
+			"file" : "C:/vscpr/Tasks_Furman/build/_deps/googletest-subbuild/CMakeFiles/beda3ab0d1a9fe31e100465407ff6c3a/googletest-populate-configure.rule"
+		},
+		{
+			"file" : "C:/vscpr/Tasks_Furman/build/_deps/googletest-subbuild/CMakeFiles/beda3ab0d1a9fe31e100465407ff6c3a/googletest-populate-download.rule"
+		},
+		{
+			"file" : "C:/vscpr/Tasks_Furman/build/_deps/googletest-subbuild/CMakeFiles/beda3ab0d1a9fe31e100465407ff6c3a/googletest-populate-install.rule"
+		},
+		{
+			"file" : "C:/vscpr/Tasks_Furman/build/_deps/googletest-subbuild/CMakeFiles/beda3ab0d1a9fe31e100465407ff6c3a/googletest-populate-mkdir.rule"
+		},
+		{
+			"file" : "C:/vscpr/Tasks_Furman/build/_deps/googletest-subbuild/CMakeFiles/beda3ab0d1a9fe31e100465407ff6c3a/googletest-populate-patch.rule"
+		},
+		{
+			"file" : "C:/vscpr/Tasks_Furman/build/_deps/googletest-subbuild/CMakeFiles/beda3ab0d1a9fe31e100465407ff6c3a/googletest-populate-test.rule"
+		},
+		{
+			"file" : "C:/vscpr/Tasks_Furman/build/_deps/googletest-subbuild/CMakeFiles/beda3ab0d1a9fe31e100465407ff6c3a/googletest-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"googletest-populate"
+		],
+		"name" : "googletest-populate"
+	}
+}
