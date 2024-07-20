@@ -1,7 +1,6 @@
 #include "list.h"
 #include "gtest/gtest.h"
 
-
 TEST(StringListInit, Test1) {
     char** list;
     StringListInit(list);
@@ -156,7 +155,6 @@ TEST(StringListSort, Test1) {
     StringListDestroy(list);
 }
 
-//pause the system
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
