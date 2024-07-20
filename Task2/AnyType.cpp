@@ -1,116 +1,231 @@
-#include <iostream>
-#include <typeinfo>
-#include <typeindex>
-#include <exception>
-#include <stdexcept>
-#include <memory>
+#include "AnyType.h"
 
-class BadCastException : public std::exception {
-public:
-    const char* what() const noexcept override {
-        return "Bad cast exception";
+AnyType::AnyType(int i) : type(FundamentalType::Int) { setValue(i); }
+AnyType::AnyType(float f) : type(FundamentalType::Float) { setValue(f); }
+AnyType::AnyType(double d) : type(FundamentalType::Double) { setValue(d); }
+AnyType::AnyType(bool b) : type(FundamentalType::Bool) { setValue(b); }
+AnyType::AnyType(char c) : type(FundamentalType::Char) { setValue(c); }
+AnyType::AnyType(unsigned char uc) : type(FundamentalType::UnsignedChar) { setValue(uc); }
+AnyType::AnyType(short int si) : type(FundamentalType::ShortInt) { setValue(si); }
+AnyType::AnyType(unsigned short int usi) : type(FundamentalType::UnsignedShortInt) { setValue(usi); }
+AnyType::AnyType(long int li) : type(FundamentalType::LongInt) { setValue(li); }
+AnyType::AnyType(unsigned long int uli) : type(FundamentalType::UnsignedLongInt) { setValue(uli); }
+AnyType::AnyType(long long int lli) : type(FundamentalType::LongLongInt) { setValue(lli); }
+AnyType::AnyType(unsigned long long int ulli) : type(FundamentalType::UnsignedLongLongInt) { setValue(ulli); }
+AnyType::AnyType(long double ld) : type(FundamentalType::LongDouble) { setValue(ld); }
+AnyType::AnyType(wchar_t wc) : type(FundamentalType::WChar) { setValue(wc); }
+AnyType::AnyType(char16_t c16) : type(FundamentalType::Char16) { setValue(c16); }
+AnyType::AnyType(char32_t c32) : type(FundamentalType::Char32) { setValue(c32); }
+
+AnyType::AnyType(const AnyType& other) : type(other.type) {
+    copyValue(other);
+}
+
+AnyType::AnyType(AnyType&& other) noexcept : type(other.type) {
+    moveValue(std::move(other));
+}
+
+AnyType::~AnyType() {
+    clear();
+}
+
+AnyType& AnyType::operator=(int i) { type = FundamentalType::Int; setValue(i); return *this; }
+AnyType& AnyType::operator=(float f) { type = FundamentalType::Float; setValue(f); return *this; }
+AnyType& AnyType::operator=(double d) { type = FundamentalType::Double; setValue(d); return *this; }
+AnyType& AnyType::operator=(bool b) { type = FundamentalType::Bool; setValue(b); return *this; }
+AnyType& AnyType::operator=(char c) { type = FundamentalType::Char; setValue(c); return *this; }
+AnyType& AnyType::operator=(unsigned char uc) { type = FundamentalType::UnsignedChar; setValue(uc); return *this; }
+AnyType& AnyType::operator=(short int si) { type = FundamentalType::ShortInt; setValue(si); return *this; }
+AnyType& AnyType::operator=(unsigned short int usi) { type = FundamentalType::UnsignedShortInt; setValue(usi); return *this; }
+AnyType& AnyType::operator=(long int li) { type = FundamentalType::LongInt; setValue(li); return *this; }
+AnyType& AnyType::operator=(unsigned long int uli) { type = FundamentalType::UnsignedLongInt; setValue(uli); return *this; }
+AnyType& AnyType::operator=(long long int lli) { type = FundamentalType::LongLongInt; setValue(lli); return *this; }
+AnyType& AnyType::operator=(unsigned long long int ulli) { type = FundamentalType::UnsignedLongLongInt; setValue(ulli); return *this; }
+AnyType& AnyType::operator=(long double ld) { type = FundamentalType::LongDouble; setValue(ld); return *this; }
+AnyType& AnyType::operator=(wchar_t wc) { type = FundamentalType::WChar; setValue(wc); return *this; }
+AnyType& AnyType::operator=(char16_t c16) { type = FundamentalType::Char16; setValue(c16); return *this; }
+AnyType& AnyType::operator=(char32_t c32) { type = FundamentalType::Char32; setValue(c32); return *this; }
+
+AnyType& AnyType::operator=(const AnyType& other) {
+    if (this != &other) {
+        clear();
+        type = other.type;
+        copyValue(other);
     }
-};
+    return *this;
+}
 
-class AnyType {
-public:
-    AnyType() : content(nullptr), typeIndex(std::type_index(typeid(void))) {}
-
-    template<typename T>
-    AnyType(T value) : content(new Derived<T>(value)), typeIndex(std::type_index(typeid(T))) {}
-
-    AnyType(const AnyType& other) : content(other.content ? other.content->clone() : nullptr), typeIndex(other.typeIndex) {}
-
-    AnyType(AnyType&& other) noexcept : content(std::move(other.content)), typeIndex(other.typeIndex) {
-        other.typeIndex = std::type_index(typeid(void));
+AnyType& AnyType::operator=(AnyType&& other) noexcept {
+    if (this != &other) {
+        clear();
+        type = other.type;
+        moveValue(std::move(other));
     }
+    return *this;
+}
 
-    ~AnyType() = default;
+AnyType::operator int() const {
+    if (type != FundamentalType::Int) throw BadCastException();
+    return *reinterpret_cast<const int*>(value);
+}
 
-    AnyType& operator=(const AnyType& other) {
-        if (this != &other) {
-            content.reset(other.content ? other.content->clone() : nullptr);
-            typeIndex = other.typeIndex;
-        }
-        return *this;
-    }
+AnyType::operator float() const {
+    if (type != FundamentalType::Float) throw BadCastException();
+    return *reinterpret_cast<const float*>(value);
+}
 
-    AnyType& operator=(AnyType&& other) noexcept {
-        if (this != &other) {
-            content = std::move(other.content);
-            typeIndex = other.typeIndex;
-            other.typeIndex = std::type_index(typeid(void));
-        }
-        return *this;
-    }
+AnyType::operator double() const {
+    if (type != FundamentalType::Double) throw BadCastException();
+    return *reinterpret_cast<const double*>(value);
+}
 
-    template<typename T>
-    AnyType& operator=(T value) {
-        content.reset(new Derived<T>(value));
-        typeIndex = std::type_index(typeid(T));
-        return *this;
-    }
+AnyType::operator bool() const {
+    if (type != FundamentalType::Bool) throw BadCastException();
+    return *reinterpret_cast<const bool*>(value);
+}
 
+AnyType::operator char() const {
+    if (type != FundamentalType::Char) throw BadCastException();
+    return *reinterpret_cast<const char*>(value);
+}
 
-    void destroy() {
-        content.reset();
-        typeIndex = std::type_index(typeid(void));
-    }
+AnyType::operator unsigned char() const {
+    if (type != FundamentalType::UnsignedChar) throw BadCastException();
+    return *reinterpret_cast<const unsigned char*>(value);
+}
 
-    void swap(AnyType& other) noexcept {
-        std::swap(content, other.content);
-        std::swap(typeIndex, other.typeIndex);
-    }
+AnyType::operator short int() const {
+    if (type != FundamentalType::ShortInt) throw BadCastException();
+    return *reinterpret_cast<const short int*>(value);
+}
 
-    std::type_index getType() const noexcept {
-        return typeIndex;
-    }
+AnyType::operator unsigned short int() const {
+    if (type != FundamentalType::UnsignedShortInt) throw BadCastException();
+    return *reinterpret_cast<const unsigned short int*>(value);
+}
 
-    template<typename T>
-    T to() const {
-        if (typeIndex != std::type_index(typeid(T))) {
-            throw BadCastException();
-        }
-        return static_cast<Derived<T>*>(content.get())->value;
-    }
+AnyType::operator long int() const {
+    if (type != FundamentalType::LongInt) throw BadCastException();
+    return *reinterpret_cast<const long int*>(value);
+}
 
-private:
-    struct Base {
-        virtual ~Base() = default;
-        virtual Base* clone() const = 0;
-    };
+AnyType::operator unsigned long int() const {
+    if (type != FundamentalType::UnsignedLongInt) throw BadCastException();
+    return *reinterpret_cast<const unsigned long int*>(value);
+}
 
-    template<typename T>
-    struct Derived : Base {
-        Derived(T value) : value(value) {}
-        Base* clone() const override { return new Derived(value); }
-        T value;
-    };
+AnyType::operator long long int() const {
+    if (type != FundamentalType::LongLongInt) throw BadCastException();
+    return *reinterpret_cast<const long long int*>(value);
+}
 
-    std::unique_ptr<Base> content;
-    std::type_index typeIndex;
-};
+AnyType::operator unsigned long long int() const {
+    if (type != FundamentalType::UnsignedLongLongInt) throw BadCastException();
+    return *reinterpret_cast<const unsigned long long int*>(value);
+}
 
-int main() {
-    AnyType anyType = 1;
+AnyType::operator long double() const {
+    if (type != FundamentalType::LongDouble) throw BadCastException();
+    return *reinterpret_cast<const long double*>(value);
+}
 
-    anyType = true;
+AnyType::operator wchar_t() const {
+    if (type != FundamentalType::WChar) throw BadCastException();
+    return *reinterpret_cast<const wchar_t*>(value);
+}
 
-    anyType = 1.7;
+AnyType::operator char16_t() const {
+    if (type != FundamentalType::Char16) throw BadCastException();
+    return *reinterpret_cast<const char16_t*>(value);
+}
 
-    anyType = std::string("Hello");
+AnyType::operator char32_t() const {
+    if (type != FundamentalType::Char32) throw BadCastException();
+    return *reinterpret_cast<const char32_t*>(value);
+}
 
-    try {
-        std::cout << anyType.to<std::string>() << std::endl;
-    } catch (const BadCastException& e) {
-        std::cout << e.what() << std::endl;
-    }
+FundamentalType AnyType::getType() const {
+    return type;
+}
 
-    try {
-        std::cout << anyType.to<int>() << std::endl;
-    } catch (const BadCastException& e) {
-        std::cout << e.what() << std::endl;
-    }
+void AnyType::clear() {
+    std::memset(value, 0, sizeof(value));
+    std::memset(&type, 0, sizeof(type));
+}
 
-    return 0;
+void AnyType::setValue(int i) {
+    new (value) int(i);
+}
+
+void AnyType::setValue(float f) {
+    new (value) float(f);
+}
+
+void AnyType::setValue(double d) {
+    new (value) double(d);
+}
+
+void AnyType::setValue(bool b) {
+    new (value) bool(b);
+}
+
+void AnyType::setValue(char c) {
+    new (value) char(c);
+}
+
+void AnyType::setValue(unsigned char uc) {
+    new (value) unsigned char(uc);
+}
+
+void AnyType::setValue(short int si) {
+    new (value) short int(si);
+}
+
+void AnyType::setValue(unsigned short int usi) {
+    new (value) unsigned short int(usi);
+}
+
+void AnyType::setValue(long int li) {
+    new (value) long int(li);
+}
+
+void AnyType::setValue(unsigned long int uli) {
+    new (value) unsigned long int(uli);
+}
+
+void AnyType::setValue(long long int lli) {
+    new (value) long long int(lli);
+}
+
+void AnyType::setValue(unsigned long long int ulli) {
+    new (value) unsigned long long int(ulli);
+}
+
+void AnyType::setValue(long double ld) {
+    new (value) long double(ld);
+}
+
+void AnyType::setValue(wchar_t wc) {
+    new (value) wchar_t(wc);
+}
+
+void AnyType::setValue(char16_t c16) {
+    new (value) char16_t(c16);
+}
+
+void AnyType::setValue(char32_t c32) {
+    new (value) char32_t(c32);
+}
+
+void AnyType::copyValue(const AnyType& other) {
+    clear();
+    std::memcpy(value, other.value, sizeof(value));
+    std::memcpy(&type, &other.type, sizeof(type));
+}
+
+void AnyType::moveValue(AnyType&& other) noexcept {
+    clear();
+    std::memcpy(value, other.value, sizeof(value));
+    std::memcpy(&type, &other.type, sizeof(type));
+    other.clear();
 }
